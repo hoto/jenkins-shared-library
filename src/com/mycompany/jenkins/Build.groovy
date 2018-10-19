@@ -9,8 +9,8 @@ class Build implements Serializable {
     }
 
     void setBuildDescription(Map args) {
-        script.currentBuild.displayName = "Custom message: ${args.message}"
-        script.currentBuild.description = "Custom description: ${args.description}"
+        script.currentBuild.displayName = args.message
+        script.currentBuild.description = args.description
     }
 
 }

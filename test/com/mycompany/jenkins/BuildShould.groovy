@@ -24,7 +24,7 @@ class BuildShould extends Specification {
         )
 
         then:
-        script.currentBuild.displayName == 'Custom message: MESSAGE'
-        script.currentBuild.description == 'Custom description: DESCRIPTION'
+        script.currentBuild.displayName == 'MESSAGE'
+        script.currentBuild.description == 'DESCRIPTION'
     }
 }
