@@ -1,0 +1,42 @@
+apply plugin: 'groovy'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.14'
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+    testCompile 'cglib:cglib-nodep:3.2.5'
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src']
+        }
+    }
+
+    test {
+        groovy {
+            srcDirs = ['test']
+        }
+    }
+}
+
+clean.doFirst {
+    delete "${rootDir}/out"
+}
+
+test {
+    afterSuite { desc, result ->
+        if (!desc.parent)
+            println("${result.resultType} " +
+                "(${result.testCount} tests, " +
+                "${result.successfulTestCount} successes, " +
+                "${result.failedTestCount} failures, " +
+                "${result.skippedTestCount} skipped)")
+    }
+}
+
+
