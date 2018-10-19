@@ -9,7 +9,7 @@ class Build implements Serializable {
     }
 
     void setBuildDescription(Map args) {
-        script.currentBuild.displayName = args.message
+        script.currentBuild.displayName = args.title
         script.currentBuild.description = args.description
     }
 

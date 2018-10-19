@@ -19,7 +19,7 @@ class BuildShould extends Specification {
     def 'set build description'() {
         when:
         build.setBuildDescription(
-            message: MESSAGE,
+            title: MESSAGE,
             description: DESCRIPTION,
         )
 
