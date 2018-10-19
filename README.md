@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/hoto/jenkinsfile-loader/tree/master.svg?style=svg)](https://circleci.com/gh/hoto/jenkinsfile-loader/tree/master)
 ### Jenkins Shared Library
 
 Used for demonstration purposes in [jenkinsfile-examples](https://github.com/hoto/jenkinsfile-examples)

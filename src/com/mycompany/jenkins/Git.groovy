@@ -25,6 +25,11 @@ class Git implements Serializable {
         content.substring(0, Math.min(maxLength, content.length())).trim()
     }
 
+    String shortBranchName() {
+        String[] fullName = script.env.BRANCH_NAME.split('/')
+        fullName.length > 1 ? fullName[1] : fullName[0]
+    }
+
     boolean isMasterBranch() {
         script.env.BRANCH_NAME == 'master'
     }

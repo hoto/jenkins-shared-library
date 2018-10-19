@@ -43,6 +43,22 @@ class GitShould extends Specification {
         git.commitHash() == COMMIT_HASH.substring(0, 7).trim()
     }
 
+    def 'leave branch name as is if does not contain a slash'() {
+        given:
+        script.env >> [BRANCH_NAME: 'TESLA-123-some-feature']
+
+        expect:
+        git.shortBranchName() == "TESLA-123-some-feature"
+    }
+
+    def 'shorten branch name if it contains a slash'() {
+        given:
+        script.env >> [BRANCH_NAME: 'feature/TESLA-123-some-feature']
+
+        expect:
+        git.shortBranchName() == "TESLA-123-some-feature"
+    }
+
     def 'return true when branch is master'() {
         given:
         script.env >> [BRANCH_NAME: 'master']
