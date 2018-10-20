@@ -1,8 +1,8 @@
 def call(Map args) {
-    stage('Set Build Description') {
+    stage('Build') {
         steps {
             script {
-                echo 'Setting build description'
+                echo 'Building...'
             }
         }
     }
