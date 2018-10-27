@@ -3,6 +3,7 @@ def call(Map args) {
         steps {
             script {
                 echo 'Deploy...'
+                echo "Command: ${args.command}"
             }
         }
     }

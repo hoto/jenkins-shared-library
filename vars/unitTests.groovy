@@ -3,6 +3,7 @@ def call(Map args) {
         steps {
             script {
                 echo 'Running unit tests...'
+                echo "Command: ${args.command}"
             }
         }
     }
