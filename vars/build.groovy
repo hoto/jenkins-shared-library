@@ -1,12 +1,10 @@
 def call(Map args) {
+  node {
     stage('Build') {
-        steps {
-            script {
-                echo 'Building...'
-                echo "Command: ${args.command}"
-            }
-        }
+      echo 'Building...'
+      echo "Command: ${args.command}"
     }
+  }
 }
 
 
