@@ -12,28 +12,28 @@ def call(Map args) {
   return this
 }
 
-def build() {
+def build(Map args) {
   node {
     stage('Build') {
-      echo 'build()'
+      echo "Command: ${args.command}"
     }
   }
   return this
 }
 
-def unitTest() {
+def unitTest(Map args) {
   node {
     stage('Unit Test') {
-      echo 'unitTest()'
+      echo "Command: ${args.command}"
     }
   }
   return this
 }
 
-def deploy() {
+def deploy(Map args) {
   node {
     stage('Deploy') {
-      echo 'deploy()'
+      echo "Command: ${args.command}"
     }
   }
   return this
