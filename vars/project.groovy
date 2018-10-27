@@ -7,21 +7,27 @@ def call(Map args) {
 
 def build() {
   node {
-    echo 'build()'
+    stage('Build') {
+      echo 'build()'
+    }
   }
   return this
 }
 
 def unitTest() {
   node {
-    echo 'unitTest()'
+    stage('Unit Test') {
+      echo 'unitTest()'
+    }
   }
   return this
 }
 
 def deploy() {
   node {
-    echo 'deploy()'
+    stage('Deploy') {
+      echo 'deploy()'
+    }
   }
   return this
 }
