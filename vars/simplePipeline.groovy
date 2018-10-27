@@ -1,6 +1,13 @@
+/**
+ * Simple pipeline utilizing fluent interface.
+ */
 def call(Map args) {
   node {
-    echo 'call()'
+    def build = args.jsl.com.mycompany.jenkins.Build.new(this)
+    build.setBuildDescription([
+      title      : 'My build title',
+      description: 'My build description'
+    ])
   }
   return this
 }
