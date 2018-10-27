@@ -2,16 +2,16 @@ package com.mycompany.jenkins
 
 class Build implements Serializable {
 
-    private final def script
+  private final def script
 
-    Build(def script) {
-        this.script = script
-    }
+  Build(def script) {
+    this.script = script
+  }
 
-    void setBuildDescription(Map args) {
-        script.currentBuild.displayName = args.title
-        script.currentBuild.description = args.description
-    }
+  void setBuildDescription(Map args) {
+    script.currentBuild.displayName = args.title
+    script.currentBuild.description = args.description
+  }
 
 }
 
