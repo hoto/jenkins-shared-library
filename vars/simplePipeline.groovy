@@ -28,11 +28,9 @@ def unitTest(Map args) {
 }
 
 def deploy(Map args) {
-  if (args.whenBranch == env.BRANCH_NAME) {
-    node {
-      stage('Deploy') {
-        echo "Command: ${args.command}"
-      }
+  node {
+    stage('Deploy') {
+      echo "Command: ${args.command}"
     }
   }
   return this
