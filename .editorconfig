@@ -12,5 +12,8 @@ trim_trailing_whitespace = true
 insert_final_newline = false
 trim_trailing_whitespace = false
 
+[Jenkinsfile*]
+indent_size = 2
+
 [*.groovy]
 indent_size = 2
