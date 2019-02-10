@@ -1,6 +1,3 @@
-/**
- * Simple pipeline utilizing fluent interface.
- */
 def call(Map args) {
   node {
     def build = args.jsl.com.mycompany.jenkins.Build.new(this)
@@ -31,9 +28,11 @@ def unitTest(Map args) {
 }
 
 def deploy(Map args) {
-  node {
-    stage('Deploy') {
-      echo "Command: ${args.command}"
+  if (args.whenBranch == env.BRANCH_NAME) {
+    node {
+      stage('Deploy') {
+        echo "Command: ${args.command}"
+      }
     }
   }
   return this
