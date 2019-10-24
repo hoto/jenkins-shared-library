@@ -3,6 +3,10 @@
 
 Used for demonstration purposes in [jenkinsfile-examples](https://github.com/hoto/jenkinsfile-examples)
 
+### Blog using this repository:
+
+* [Private Jenkins Shared Libraries](https://medium.com/@AndrzejRehmann/private-jenkins-shared-libraries-540abe7a0ab7)
+
 ### Documentation
 
 * https://jenkins.io/doc/book/pipeline/shared-libraries/
