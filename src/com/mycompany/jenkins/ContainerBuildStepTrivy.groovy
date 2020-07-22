@@ -1,11 +1,11 @@
 package com.mycompany.jenkins
 
-class containerBuildStep implements Serializable {
+class ContainerBuildStepTrivy implements Serializable {
 
   private final def script
 
-    containerBuildStep(def script) {
-    this.script = script
+  ContainerBuildStepTrivy(def jenkinsfileScriptContext) {
+    this.script = jenkinsfileScriptContext
   }
 
   boolean scan(String CONTAINER_TAG) {
