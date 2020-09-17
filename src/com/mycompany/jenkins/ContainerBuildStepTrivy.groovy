@@ -8,13 +8,13 @@ class ContainerBuildStepTrivy implements Serializable {
     this.script = jenkinsfileScriptContext
   }
 
-  boolean scan(String CONTAINER_TAG) {
+  boolean scan(def config, String imageTag) {
     script.sh """
+              set -Eeux
+
               cat <<EOF > .trivyignore
               CVE-2018-20843
 EOF
-
-#                -v ~/.cache:/root/.cache/ \
 
               docker run --rm \
                 -v "\${PWD}/.trivyignore:/.trivyignore" \
@@ -23,7 +23,7 @@ EOF
                 --ignore-unfixed \
                 --exit-code 0 \
                 --severity HIGH,CRITICAL \
-                ${CONTAINER_TAG}
+                ${imageTag}
                 """
   }
 

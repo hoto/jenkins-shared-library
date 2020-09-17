@@ -2,56 +2,58 @@
 
 import com.mycompany.jenkins.*
 
-// from https://stackoverflow.com/questions/54124966/passing-parameters-from-jenkinsfile-to-a-shared-library
 def call(def body = [:]) {
   // evaluate the body block, and collect configuration into the object
   config = BuildConfig.resolve(body)
 
-  println "----- CONFIG DUMP -----"
-//  println config.dump()
-  println config.stages.dump()
+  def agentInsecureConfigImage = 'docker.io/controlplane/gcloud-sdk:latest'
 
-  // env not available here
+  /**
+   * next:
+   * - common use cases for flows to map to this
+   * - questions of container build step image startup time?
+   * - should there be a JAR/artefact build *outside* a container?
+   * - ** low level developer workflow **
+   * - bitbucket: enablement, training, intrinsic value with everything as code
+   *
+   *
+   * what about tests that require integration with a container
+   * - fe apps with selenium
+   * - db-close apps
+   * - middleware proxies
+   * - stovepipe tests
+   *
+   * CI vs CD differences
+   * - cycle time vs stricter general lifecycle definition
+   *
+   * # CI
+   * unit - mock interfaces
+   * - static, config
+   * integration
+   * - component - multiple java classes/objects
+   *
+   * # CD
+   * integration
+   * - system - containers
+   * acceptance
+   * - smoke
+   *
+   */
 
-
-  upstreamProjectName = currentBuild.upstreamBuilds ? currentBuild.upstreamBuilds[0].getProjectName() : ""
-
-  isUpstreamAutoJob = (upstreamProjectName != "" && upstreamProjectName.substring(0, 4).toLowerCase() == 'auto')
-
-  env.ENV_TEMPLATE = env.ENV_TEMPLATE ?: ""
-  if (env.MAKEFILE_RECIPE_TARGET == "run-51-workshop-template" && env.ENV_TEMPLATE != "") {
-    SET_ENV_TEMPLATE = "ENVIRONMENT_TEMPLATE=${env.ENV_TEMPLATE}"
-  } else {
-    SET_ENV_TEMPLATE = ""
-  }
-
-  // cp-config is checked out to a first-level subdirectory, so this path must traverse upwards once
-  // todo(ajm) cp-config must be checked out when running this pipeline from a non-cp-config job
-//  artifactOutputPath = "../_artifacts/output/"
-  artifactOutputPath = "_artifacts/output/"
-
-  isEnvFile = ""
-  if (env.TF_VARS_OVERRIDE != "") {
-    isEnvFile = "1"
-  }
-
-  def agentConfigImage = 'docker.io/controlplane/gcloud-sdk:latest'
-
-  def imageStepHadolint = 'controlplaneio/build-step-hadolint:ajm-test'
   def imageStepConform = 'controlplaneio/build-step-conform:ajm-test'
+  def imageStepHadolint = 'controlplaneio/build-step-hadolint:ajm-test'
   def imageStepGitSecrets = 'controlplaneio/build-step-git-secrets:ajm-test'
 
   def imageStepConfigArgs =
     '-e IS_IN_AUTOMATION=true ' +
-    '--tmpfs /tmp ' +
-    '--cap-drop=ALL ' +
-    '--cap-add=DAC_OVERRIDE ' +
-    '--cap-add=CHOWN ' +
-    '--cap-add=FOWNER ' +
-    '--cap-add=DAC_READ_SEARCH '
+      '--tmpfs /tmp ' +
+      '--cap-drop=ALL ' +
+      '--cap-add=CHOWN ' +
+      '--cap-add=DAC_OVERRIDE ' +
+      '--cap-add=DAC_READ_SEARCH ' +
+      '--cap-add=FOWNER '
 
-// http://man7.org/linux/man-pages/man7/capabilities.7.html
-  def agentConfigArgs = imageStepConfigArgs +
+  def agentInsecureConfigArgs = imageStepConfigArgs +
     '-v /var/run/docker.sock:/var/run/docker.sock ' +
     '--user=root '
 
@@ -64,7 +66,9 @@ def call(def body = [:]) {
     }
 
     options {
+      disableConcurrentBuilds()
       parallelsAlwaysFailFast()
+      ansiColor('xterm')
     }
 
     stages {
@@ -72,7 +76,7 @@ def call(def body = [:]) {
       // ------------------------------------------------------------------------------------------------
       // ------------------------------------------------------------------------------------------------
 
-      stage ("Static Analysis and Build") {
+      stage("Static Analysis and Build") {
 
         parallel {
 
@@ -89,7 +93,7 @@ def call(def body = [:]) {
                 new ContainerBuildStepConform(this).scan()
               }
             } //steps
-          } // stage
+          } // analysis stage
 
           stage('Git secrets') {
 
@@ -104,7 +108,7 @@ def call(def body = [:]) {
                 new ContainerBuildStepGitSecrets(this).scan()
               }
             } //steps
-          } // stage
+          } // analysis stage
 
           stage('Dockerfile lint') {
 
@@ -116,24 +120,34 @@ def call(def body = [:]) {
               // wrap with in-toto
               cp([:])
               script {
-                new ContainerBuildStepHadolint(this).scan()
+                new ContainerBuildStepHadolint(this).scan(config.stages.containerLint)
               }
             } //steps
-          } // stage
+          } // analysis stage
+
+          // sonar analysis
+
+          // blackduck analysis
 
           stage('Image build') {
 
             when { beforeAgent true; expression { return isStageConfigured(config.stages.containerBuild) } }
-            agent { docker { image agentConfigImage; args agentConfigArgs; } }
+            agent { docker { image agentInsecureConfigImage; args agentInsecureConfigArgs; } }
             options { timeout(time: 25, unit: 'MINUTES'); retry(1); timestamps() }
 
             steps {
+//              in_toto_wrap(['stepName'    : 'Build',
+//                            'credentialId': "f0852160-5cc2-4389-b658-f5ee2bd82922",
+//                            'transport'   : 'grafeas+http://192.168.1.11:8090']) {
+              echo 'Building..'
+
               script {
-                new ContainerBuildStepDockerBuild(this).build(imageTag)
+                new ContainerBuildStepContainerBuild(this).build(imageTag, config.stages.containerBuild)
               }
 
+//              }
             } //steps
-          } // stage
+          } // artefact stage
 
         }
       }
@@ -147,8 +161,8 @@ def call(def body = [:]) {
 
         agent {
           docker {
-            image agentConfigImage
-            args agentConfigArgs
+            image agentInsecureConfigImage
+            args agentInsecureConfigArgs
           }
         }
 
@@ -156,7 +170,31 @@ def call(def body = [:]) {
 
         steps {
           script {
-            new ContainerBuildStepTrivy(this).scan(imageTag)
+            new ContainerBuildStepTrivy(this).scan(config.stages.containerScan, imageTag)
+          }
+        } //steps
+      } // stage
+
+      stage('Image push') {
+
+        when { beforeAgent true; expression { return isStageConfigured(config.stages.containerPush) } }
+
+        agent {
+          docker {
+            image agentInsecureConfigImage
+            args agentInsecureConfigArgs
+          }
+        }
+
+        options { timeout(time: 25, unit: 'MINUTES'); retry(1); timestamps() }
+        environment {
+          DOCKER_REGISTRY_CREDENTIALS = credentials("${ENVIRONMENT}_docker_credentials")
+        }
+
+        steps {
+          script {
+            new ContainerBuildStepContainerPush(this).push(
+              config.stages.containerPush, imageTag, DOCKER_REGISTRY_CREDENTIALS_PSW, DOCKER_REGISTRY_CREDENTIALS_USR)
           }
         } //steps
       } // stage
@@ -194,7 +232,7 @@ def getGitRepositoryName() {
     buildError "GIT_URL value was empty at usage."
   }
 
-  return sh (
+  return sh(
     script: "basename '${env.GIT_URL}'",
     returnStdout: true
   ).trim()

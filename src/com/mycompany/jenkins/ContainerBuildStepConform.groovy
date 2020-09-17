@@ -10,6 +10,8 @@ class ContainerBuildStepConform implements Serializable {
 
   boolean scan() {
     script.sh """
+              set -Eeux
+
               IS_IN_AUTOMATION="" /entrypoint.sh
               """
   }
