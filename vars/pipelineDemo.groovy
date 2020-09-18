@@ -40,9 +40,9 @@ def call(def body = [:]) {
    *
    */
 
-  def imageStepConform = 'controlplaneio/build-step-conform:ajm-test'
-  def imageStepHadolint = 'controlplaneio/build-step-hadolint:ajm-test'
-  def imageStepGitSecrets = 'controlplaneio/build-step-git-secrets:ajm-test'
+  def imageStepConform = 'controlplaneio/build-step-conform:latest'
+  def imageStepHadolint = 'controlplaneio/build-step-hadolint:latest'
+  def imageStepGitSecrets = 'controlplaneio/build-step-git-secrets:latest'
 
   def imageStepConfigArgs =
     '-e IS_IN_AUTOMATION=true ' +
