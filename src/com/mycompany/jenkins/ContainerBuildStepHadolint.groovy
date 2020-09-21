@@ -18,7 +18,7 @@ class ContainerBuildStepHadolint implements Serializable {
               set -Eeux
 
               FILES="${dockerfiles}"
-              FILES="\${FILES:-\$(find **/Dockerfile*)}"
+              FILES="\${FILES:-\$(find . -name 'Dockerfile*')}"
 
               IFS="\t\n"
               for FILE in "\${FILES}"; do
