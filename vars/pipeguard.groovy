@@ -297,21 +297,6 @@ END_OF_TF_VARS_OVERRIDE
                 } else {
                   error("Unknown `Makefile` or `pipeline` error, bash exit code: ${exitCode}")
                 }
-
-                // push container image
-
-                // TODO(ajm) isolate DOCKER_REGISTRY_CREDENTIALS to this block
-                sh """#!/bin/bash
-                  set -euxo pipefail
-
-                  echo '${DOCKER_REGISTRY_CREDENTIALS_PSW}' \
-                  | docker login \
-                    --username '${DOCKER_REGISTRY_CREDENTIALS_USR}' \
-                    --password-stdin
-
-                  make push CONTAINER_TAG="${getContainerTag()}"
-                """
-
               } finally {
                 // reset filesystem permissions, create and archive artifacts
 
