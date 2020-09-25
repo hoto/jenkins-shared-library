@@ -224,7 +224,7 @@ def buildError(message = "[error message not supplied to method call]", stackTra
 }
 
 def getImageTag() {
-  return "controlplane/${getGitRepositoryName()}:${getContainerTag()}"
+  return config?.env?.imageTagOverride ?: "controlplane/${getGitRepositoryName()}:${getContainerTag()}"
 }
 
 def getGitRepositoryName() {
